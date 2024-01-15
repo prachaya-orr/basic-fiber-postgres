@@ -10,7 +10,7 @@ import (
 
 const (
 	host         = "localhost"
-	port         = 5432
+	port         = 5433
 	databaseName = "mydatabase"
 	username     = "myuser"
 	password     = "mypassword"
@@ -43,7 +43,13 @@ func main() {
 	// Connection database successful
 	fmt.Println("Connection database successful")
 
-	// err = createProduct(&Product{Name: "Product 2", Price: 2000})
+	products, err := getProducts()
+	fmt.Println("Get Successful !", products)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// err = createProduct(&Product{Name: "Product 6", Price: 2000})
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -52,18 +58,18 @@ func main() {
 	// fmt.Println("Get Successful !", product)
 
 	// err = updateProduct(4, &Product{Name: "XYZ", Price: 300})
-	product, err := updateProduct(4, &Product{Name: "UUU", Price: 300})
-	if err != nil {
-		log.Fatal(err)
-	}
+	// product, err := updateProduct(4, &Product{Name: "UUU", Price: 300})
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println("Update Successful !", product)
+	// fmt.Println("Update Successful !", product)
 
-	err = deleteProduct(4)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Delete product Successful !")
+	// err = deleteProduct(4)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println("Delete product Successful !")
 }
 
 func createProduct(product *Product) error {
@@ -85,6 +91,31 @@ func getProduct(id int) (Product, error) {
 	}
 
 	return p, nil
+}
+
+func getProducts() ([]Product, error) {
+	rows, err := db.Query("SELECT id, name, price FROM products")
+
+	if err != nil {
+		return nil, err
+	}
+
+	var products []Product
+
+	for rows.Next() {
+		var p Product
+		err := rows.Scan(&p.ID, &p.Name, &p.Price)
+		if err != nil {
+			fmt.Println("Error Scan", err)
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
 func updateProduct(id int, product *Product) (Product, error) {
