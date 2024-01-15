@@ -35,7 +35,7 @@ func main() {
 	}
 
 	db = sdb
-
+	defer db.Close()
 	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
@@ -135,7 +135,6 @@ func updateProduct(id int, product *Product) (Product, error) {
 		fmt.Println("Error Scan", err)
 		return Product{}, err
 	}
-
 	return p, err
 }
 
